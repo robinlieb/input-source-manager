@@ -24,7 +24,12 @@ public struct InputSourceManager: InputSourceManaging {
             return nil
         }
         
-        return InputSource(id: id)
+        guard let pointer = TISGetInputSourceProperty(currentInputSource, kTISPropertyLocalizedName),
+              let name = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
+            return nil
+        }
+        
+        return InputSource(id: id, localizedName: name)
     }
     
     public func getCurrentKeybaordLayoutInputSource() -> InputSource? {
@@ -35,6 +40,11 @@ public struct InputSourceManager: InputSourceManaging {
             return nil
         }
         
-        return InputSource(id: id)
+        guard let pointer = TISGetInputSourceProperty(currentInputSource, kTISPropertyLocalizedName),
+              let name = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
+            return nil
+        }
+        
+        return InputSource(id: id, localizedName: name)
     }
 }
