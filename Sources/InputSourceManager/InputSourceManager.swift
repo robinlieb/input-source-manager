@@ -1,4 +1,4 @@
-public struct input_source_manager {
+public struct InputSourceManager {
     public private(set) var text = "Hello, World!"
 
     public init() {
