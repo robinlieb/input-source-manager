@@ -1,5 +1,5 @@
 import XCTest
-@testable import input_source_manager
+@testable import InputSourceManager
 
 final class input_source_managerTests: XCTestCase {
     func testExample() throws {
