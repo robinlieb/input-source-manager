@@ -2,8 +2,8 @@ import Foundation
 import Carbon
 
 public protocol InputSourceManaging {
-    func getCurrentKeybaordInputSource() -> String?
-    func getCurrentKeybaordLayoutInputSource() -> String?
+    func getCurrentKeybaordInputSource() -> InputSource?
+    func getCurrentKeybaordLayoutInputSource() -> InputSource?
 }
 
 public struct InputSourceManager: InputSourceManaging {
@@ -16,23 +16,25 @@ public struct InputSourceManager: InputSourceManaging {
     }
     
     // MARK: - Methods
-    public func getCurrentKeybaordInputSource() -> String? {
+    public func getCurrentKeybaordInputSource() -> InputSource? {
         let currentInputSource = TISCopyCurrentKeyboardInputSource().takeUnretainedValue()
         
-        guard let id = TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID) else {
+        guard let pointer = TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID),
+              let id = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
             return nil
         }
         
-        return Unmanaged<AnyObject>.fromOpaque(id).takeUnretainedValue() as? String
+        return InputSource(id: id)
     }
     
-    public func getCurrentKeybaordLayoutInputSource() -> String? {
+    public func getCurrentKeybaordLayoutInputSource() -> InputSource? {
         let currentInputSource = TISCopyCurrentKeyboardLayoutInputSource().takeUnretainedValue()
         
-        guard let id = TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID) else {
+        guard let pointer = TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID),
+              let id = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
             return nil
         }
         
-        return Unmanaged<AnyObject>.fromOpaque(id).takeUnretainedValue() as? String
+        return InputSource(id: id)
     }
 }
