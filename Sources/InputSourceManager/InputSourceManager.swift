@@ -18,6 +18,16 @@ public protocol InputSourceManaging {
     ///     - inputSource:  String representation of the inputSource, e.g. com.apple.keylayout.US
     ///
     func setInputSource(to inputSource: String)
+    
+    /// Returns list of all input sources.
+    ///
+    /// - Returns: List of all input sources.
+    func getAllInputSources() -> [InputSource]
+    
+    /// Returns list of installed input sources.
+    ///
+    /// - Returns: List of all installed sources.
+    func getInstalledInputSources() -> [InputSource]
 }
 
 public struct InputSourceManager: InputSourceManaging {
@@ -70,5 +80,35 @@ public struct InputSourceManager: InputSourceManaging {
         let inputSource = inputSourceList[0]
         
         TISSelectInputSource(inputSource)
+    }
+    
+    public func getAllInputSources() -> [InputSource] {
+        return getInputSource(all: true)
+    }
+    
+    public func getInstalledInputSources() -> [InputSource] {
+        return getInputSource(all: false)
+    }
+    
+    // MARK: - Helpers
+    private func getInputSource(all: Bool) -> [InputSource] {
+        let inputSourcesRef = TISCreateInputSourceList(nil, all).takeRetainedValue() as NSArray
+        guard let tisInputSources = inputSourcesRef as? [TISInputSource] else {
+            return []
+        }
+        
+        var inputSources: [InputSource] = []
+        
+        for tisInputSource in tisInputSources {
+            guard let idPtr = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceID),
+                  let namePtr = TISGetInputSourceProperty(tisInputSource, kTISPropertyLocalizedName),
+                  let id = Unmanaged<AnyObject>.fromOpaque(idPtr).takeUnretainedValue() as? String,
+                  let localizedName = Unmanaged<AnyObject>.fromOpaque(namePtr).takeUnretainedValue() as? String else {
+                return []
+            }
+            let inputSource = InputSource(id: id, localizedName: localizedName)
+            inputSources.append(inputSource)
+        }
+        return inputSources
     }
 }
