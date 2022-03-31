@@ -12,6 +12,12 @@ public protocol InputSourceManaging {
     ///
     /// - Returns: InputSource object of currently selected keyboard layout input source.
     func getCurrentKeybaordLayoutInputSource() -> InputSource?
+    
+    /// Returns the currently selected keyboard layout input source.
+    /// - Parameters:
+    ///     - inputSource:  String representation of the inputSource, e.g. com.apple.keylayout.US
+    ///
+    func setInputSource(to inputSource: String)
 }
 
 public struct InputSourceManager: InputSourceManaging {
@@ -54,5 +60,15 @@ public struct InputSourceManager: InputSourceManaging {
         }
         
         return InputSource(id: id, localizedName: name)
+    }
+    
+    public func setInputSource(to inputSource: String) {
+        let inputSourceIDKey = kTISPropertyInputSourceID
+        let inputSourcePropertiesDict = [inputSourceIDKey! as String: inputSource]
+        let inputSourceList_nsarray = TISCreateInputSourceList(inputSourcePropertiesDict as CFDictionary, false).takeRetainedValue() as NSArray
+        let inputSourceList = inputSourceList_nsarray as! [TISInputSource]
+        let inputSource = inputSourceList[0]
+        
+        TISSelectInputSource(inputSource)
     }
 }
