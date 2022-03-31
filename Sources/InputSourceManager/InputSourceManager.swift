@@ -3,6 +3,7 @@ import Carbon
 
 public protocol InputSourceManaging {
     func getCurrentKeybaordInputSource() -> String?
+    func getCurrentKeybaordLayoutInputSource() -> String?
 }
 
 public struct InputSourceManager: InputSourceManaging {
@@ -17,6 +18,16 @@ public struct InputSourceManager: InputSourceManaging {
     // MARK: - Methods
     public func getCurrentKeybaordInputSource() -> String? {
         let currentInputSource = TISCopyCurrentKeyboardInputSource().takeUnretainedValue()
+        
+        guard let id = TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID) else {
+            return nil
+        }
+        
+        return Unmanaged<AnyObject>.fromOpaque(id).takeUnretainedValue() as? String
+    }
+    
+    public func getCurrentKeybaordLayoutInputSource() -> String? {
+        let currentInputSource = TISCopyCurrentKeyboardLayoutInputSource().takeUnretainedValue()
         
         guard let id = TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID) else {
             return nil
