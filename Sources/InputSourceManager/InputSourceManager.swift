@@ -2,7 +2,15 @@ import Foundation
 import Carbon
 
 public protocol InputSourceManaging {
+    
+    /// Returns the currently selected layout input source.
+    ///
+    /// - Returns: InputSource object of currently selected layout input source.
     func getCurrentKeybaordInputSource() -> InputSource?
+    
+    /// Returns the currently selected keyboard layout input source.
+    ///
+    /// - Returns: InputSource object of currently selected keyboard layout input source.
     func getCurrentKeybaordLayoutInputSource() -> InputSource?
 }
 
