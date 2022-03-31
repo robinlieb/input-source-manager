@@ -100,13 +100,17 @@ public struct InputSourceManager: InputSourceManaging {
         var inputSources: [InputSource] = []
         
         for tisInputSource in tisInputSources {
-            guard let idPtr = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceID),
-                  let namePtr = TISGetInputSourceProperty(tisInputSource, kTISPropertyLocalizedName),
-                  let id = Unmanaged<AnyObject>.fromOpaque(idPtr).takeUnretainedValue() as? String,
-                  let localizedName = Unmanaged<AnyObject>.fromOpaque(namePtr).takeUnretainedValue() as? String else {
-                return []
+            guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceID),
+                  let id = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
+                continue
             }
-            let inputSource = InputSource(id: id, localizedName: localizedName)
+            
+            guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyLocalizedName),
+                  let name = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
+                continue
+            }
+            
+            let inputSource = InputSource(id: id, localizedName: name)
             inputSources.append(inputSource)
         }
         return inputSources
