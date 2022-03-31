@@ -1,3 +1,5 @@
+import Foundation
+
 public struct InputSourceManager {
     // MARK: - Properties
     public private(set) var text = "Hello, World!"
