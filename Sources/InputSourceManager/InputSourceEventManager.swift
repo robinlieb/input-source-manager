@@ -21,7 +21,7 @@ public class InputSourceEventManager: InputSourceEventManaging {
         self.notificationCenter = notificationCenter
     }
     
-    convenience init() {
+    public convenience init() {
         self.init(inputSourceManager: InputSourceManager(),
                   iohidManager: IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone)),
                   notificationCenter: CFNotificationCenterGetDistributedCenter())
