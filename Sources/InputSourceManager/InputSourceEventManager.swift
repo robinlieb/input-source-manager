@@ -60,13 +60,13 @@ public class InputSourceEventManager: InputSourceEventManaging {
             return
         }
         
-        let selfObserver = Unmanaged<InputSourceEventManager>.fromOpaque(observer).takeUnretainedValue()
+        let selfPointer = Unmanaged<InputSourceEventManager>.fromOpaque(observer).takeUnretainedValue()
         
-        guard let inputSource = selfObserver.inputSourceManager.getCurrentKeybaordInputSource() else {
+        guard let inputSource = selfPointer.inputSourceManager.getCurrentKeybaordInputSource() else {
             return
         }
         
-        selfObserver.completionHandler?(.inputSource(inputSource))
+        selfPointer.completionHandler?(.inputSource(inputSource))
     }
     
     let inputValueCallback: IOHIDValueCallback = { context, _, sender, _ in
@@ -75,8 +75,8 @@ public class InputSourceEventManager: InputSourceEventManaging {
             return
         }
         
-        let selfObserver = Unmanaged<InputSourceEventManager>.fromOpaque(context).takeUnretainedValue()
+        let selfPointer = Unmanaged<InputSourceEventManager>.fromOpaque(context).takeUnretainedValue()
         
-        selfObserver.completionHandler?(.inputValue(InputValue(id: "")))
+        selfPointer.completionHandler?(.inputValue(InputValue(id: "")))
     }
 }
