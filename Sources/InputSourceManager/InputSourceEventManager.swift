@@ -71,12 +71,17 @@ public class InputSourceEventManager: InputSourceEventManaging {
     
     let inputValueCallback: IOHIDValueCallback = { context, _, sender, _ in
         
-        guard let context = context else {
+        guard let context = context,
+              let sender = sender else {
             return
         }
         
         let selfPointer = Unmanaged<InputSourceEventManager>.fromOpaque(context).takeUnretainedValue()
         
-        selfPointer.completionHandler?(.inputValue(InputValue(id: "")))
+        let senderDevice = Unmanaged<IOHIDDevice>.fromOpaque(sender).takeUnretainedValue()
+        
+        let inputValue = InputValue(iohidDevice: senderDevice)
+        
+        selfPointer.completionHandler?(.inputValue(inputValue))
     }
 }
