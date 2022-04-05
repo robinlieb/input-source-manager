@@ -27,6 +27,10 @@ public class InputSourceEventManager: InputSourceEventManaging {
                   notificationCenter: CFNotificationCenterGetDistributedCenter())
     }
     
+    deinit {
+        print("deinit \(self)")
+    }
+    
     // MARK: - Methods
     public func listen(event: @escaping ((InputSourceEvent) -> Void)) {
         let context = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
