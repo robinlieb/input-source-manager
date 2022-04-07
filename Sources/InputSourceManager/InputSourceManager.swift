@@ -13,6 +13,12 @@ public protocol InputSourceManaging {
     /// - Returns: InputSource object of currently selected keyboard layout input source.
     func getCurrentKeybaordLayoutInputSource() -> InputSource?
     
+    /// Returns the input source for given input source id.
+    /// - Parameters:
+    ///     - inputSource:  String representation of the inputSource, e.g. com.apple.keylayout.US
+    ///
+    func getInputSource(for inputSourceId: String)  -> InputSource?
+    
     /// Returns the currently selected keyboard layout input source.
     /// - Parameters:
     ///     - inputSource:  String representation of the inputSource, e.g. com.apple.keylayout.US
@@ -50,6 +56,22 @@ public struct InputSourceManager: InputSourceManaging {
         let currentInputSource = TISCopyCurrentKeyboardLayoutInputSource().takeUnretainedValue()
         
         return InputSource(tisInputSource: currentInputSource)
+    }
+    
+    public func getInputSource(for inputSourceId: String) -> InputSource? {
+        var inputSources: [InputSource] = []
+        let inputSourcePropertiesDict = [kTISPropertyInputSourceID as String: inputSourceId]
+        guard let tisInputSources = TISCreateInputSourceList(inputSourcePropertiesDict as CFDictionary, false).takeRetainedValue() as? [TISInputSource] else { // as NSArray
+            return nil
+        }
+        
+        for inputSource in tisInputSources {
+            if let inputSource = InputSource(tisInputSource: inputSource) {
+                inputSources.append(inputSource)
+            }
+        }
+        
+        return inputSources.first(where: { $0.id == inputSourceId })
     }
     
     public func setInputSource(to inputSource: String) {
