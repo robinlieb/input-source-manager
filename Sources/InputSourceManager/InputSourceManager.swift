@@ -43,33 +43,13 @@ public struct InputSourceManager: InputSourceManaging {
     public func getCurrentKeybaordInputSource() -> InputSource? {
         let currentInputSource = TISCopyCurrentKeyboardInputSource().takeUnretainedValue()
         
-        guard let pointer = TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID),
-              let id = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
-            return nil
-        }
-        
-        guard let pointer = TISGetInputSourceProperty(currentInputSource, kTISPropertyLocalizedName),
-              let name = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
-            return nil
-        }
-        
-        return InputSource(id: id, localizedName: name)
+        return InputSource(tisInputSource: currentInputSource)
     }
     
     public func getCurrentKeybaordLayoutInputSource() -> InputSource? {
         let currentInputSource = TISCopyCurrentKeyboardLayoutInputSource().takeUnretainedValue()
         
-        guard let pointer = TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID),
-              let id = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
-            return nil
-        }
-        
-        guard let pointer = TISGetInputSourceProperty(currentInputSource, kTISPropertyLocalizedName),
-              let name = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
-            return nil
-        }
-        
-        return InputSource(id: id, localizedName: name)
+        return InputSource(tisInputSource: currentInputSource)
     }
     
     public func setInputSource(to inputSource: String) {
@@ -100,18 +80,10 @@ public struct InputSourceManager: InputSourceManaging {
         var inputSources: [InputSource] = []
         
         for tisInputSource in tisInputSources {
-            guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceID),
-                  let id = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
-                continue
-            }
             
-            guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyLocalizedName),
-                  let name = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
-                continue
+            if let inputSource = InputSource(tisInputSource: tisInputSource) {
+                inputSources.append(inputSource)
             }
-            
-            let inputSource = InputSource(id: id, localizedName: name)
-            inputSources.append(inputSource)
         }
         return inputSources
     }
