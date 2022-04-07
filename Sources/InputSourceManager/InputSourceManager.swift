@@ -19,7 +19,7 @@ public protocol InputSourceManaging {
     ///
     func getInputSource(for inputSourceId: String)  -> InputSource?
     
-    /// Returns the currently selected keyboard layout input source.
+    /// Sets the input source to the given input source id.
     /// - Parameters:
     ///     - inputSource:  String representation of the inputSource, e.g. com.apple.keylayout.US
     ///
