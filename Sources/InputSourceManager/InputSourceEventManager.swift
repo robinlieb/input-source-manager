@@ -1,17 +1,17 @@
 import Foundation
 import Carbon
+import Combine
 
-public protocol InputSourceEventManaging {
-    func listen(event: @escaping ((InputSourceEvent) -> Void))
-}
-
-public class InputSourceEventManager: InputSourceEventManaging {
+@available(macOS 10.15, *)
+public class InputSourceEventManager: ObservableObject {
     
     // MARK: - Properties
     let inputSourceManager: InputSourceManaging
     let iohidManager: IOHIDManager
     let notificationCenter: CFNotificationCenter
-    var completionHandler: ((InputSourceEvent) -> Void)?
+    
+    @Published
+    public private(set) var event: InputSourceEvent?
     
     // MARK: - Init
     
@@ -19,6 +19,7 @@ public class InputSourceEventManager: InputSourceEventManaging {
         self.inputSourceManager = inputSourceManager
         self.iohidManager = iohidManager
         self.notificationCenter = notificationCenter
+        self.setup()
     }
     
     public convenience init() {
@@ -31,8 +32,8 @@ public class InputSourceEventManager: InputSourceEventManaging {
         print("deinit \(self)")
     }
     
-    // MARK: - Methods
-    public func listen(event: @escaping ((InputSourceEvent) -> Void)) {
+    // MARK: - Helpers
+    private func setup() {
         let context = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
         CFNotificationCenterAddObserver(notificationCenter, context, layoutCallback, kTISNotifySelectedKeyboardInputSourceChanged, nil, .deliverImmediately)
         
@@ -45,10 +46,8 @@ public class InputSourceEventManager: InputSourceEventManaging {
         IOHIDManagerRegisterInputValueCallback(iohidManager, inputValueCallback, context)
         IOHIDManagerScheduleWithRunLoop(iohidManager, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
         IOHIDManagerOpen(iohidManager, IOOptionBits(kIOHIDOptionsTypeNone))
-        completionHandler = event
     }
     
-    // MARK: - Helpers
     private func createDict(page: Int, usage: Int) -> CFMutableDictionary {
         [kIOHIDDeviceUsagePageKey: page, kIOHIDDeviceUsageKey : usage] as! CFMutableDictionary
     }
@@ -66,7 +65,7 @@ public class InputSourceEventManager: InputSourceEventManaging {
             return
         }
         
-        selfPointer.completionHandler?(.inputSource(inputSource))
+        selfPointer.event = .inputSource(inputSource)
     }
     
     let inputValueCallback: IOHIDValueCallback = { context, _, sender, _ in
@@ -82,6 +81,6 @@ public class InputSourceEventManager: InputSourceEventManaging {
         
         let inputValue = InputValue(iohidDevice: senderDevice)
         
-        selfPointer.completionHandler?(.inputValue(inputValue))
+        selfPointer.event = .inputValue(inputValue)
     }
 }
