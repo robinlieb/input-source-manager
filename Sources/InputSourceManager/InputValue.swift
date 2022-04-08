@@ -6,6 +6,9 @@ protocol IOHIDDeviceConvertible {
 
 public struct InputValue {
     
+    // The unique id of the input value
+    public var id: Int?
+    
     // A key for specifying the vendor ID of the device.
     public var vendorId: Int?
     
@@ -30,7 +33,8 @@ public struct InputValue {
     // A key that specifies the country code or region of the device.
     public var countryCode: Int?
     
-    init(vendorId: Int? = nil,
+    init(id: Int? = nil,
+         vendorId: Int? = nil,
          manufacturer: String? = nil,
          serialNumber: String? = nil,
          product: String? = nil,
@@ -38,6 +42,7 @@ public struct InputValue {
          productId: Int? = nil,
          transport: String? = nil,
          countryCode: Int? = nil) {
+        self.id = id
         self.vendorId = vendorId
         self.manufacturer = manufacturer
         self.serialNumber = serialNumber
@@ -51,6 +56,7 @@ public struct InputValue {
 
 extension InputValue: IOHIDDeviceConvertible {
     init(iohidDevice: IOHIDDevice) {
+        let id = IOHIDDeviceGetProperty(iohidDevice, kIOHIDUniqueIDKey as CFString) as? Int
         let serialNumber = IOHIDDeviceGetProperty(iohidDevice, kIOHIDSerialNumberKey as CFString) as? String
         let vendorId = IOHIDDeviceGetProperty(iohidDevice, kIOHIDVendorIDKey as CFString) as? Int
         let countryCode = IOHIDDeviceGetProperty(iohidDevice, kIOHIDCountryCodeKey as CFString) as? Int
@@ -60,6 +66,7 @@ extension InputValue: IOHIDDeviceConvertible {
         let productId = IOHIDDeviceGetProperty(iohidDevice, kIOHIDProductIDKey as CFString) as? Int
         let transport = IOHIDDeviceGetProperty(iohidDevice, kIOHIDTransportKey as CFString) as? String
         
+        self.id = id
         self.serialNumber = serialNumber
         self.vendorId = vendorId
         self.countryCode = countryCode
