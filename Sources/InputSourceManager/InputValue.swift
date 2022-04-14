@@ -6,7 +6,7 @@ protocol IOHIDDeviceConvertible {
 
 public struct InputValue {
     
-    // The unique id of the input value
+    // The id of the input value
     public var id: Int?
     
     // A key for specifying the vendor ID of the device.
