@@ -1,5 +1,6 @@
 import Foundation
 import Carbon
+import SwiftUI
 
 protocol TISInputSourceConvertible {
     init?(tisInputSource: TISInputSource)
@@ -62,55 +63,36 @@ public struct InputSource {
 
 extension InputSource: TISInputSourceConvertible {
     init?(tisInputSource: TISInputSource) {
-        guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceID),
-              let id = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
+        guard let id = tisInputSource.getProperty(for: kTISPropertyInputSourceID) as? String else {
             return nil
         }
         
-        guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyLocalizedName),
-              let name = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
+        guard let name = tisInputSource.getProperty(for: kTISPropertyLocalizedName) as? String else {
             return nil
         }
         
-        guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceCategory),
-              let category = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? String else {
+        guard let category = tisInputSource.getProperty(for: kTISPropertyInputSourceCategory) as? String else {
             return nil
         }
         
-        guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceIsSelectCapable),
-              let isSelectable = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? Bool else {
+        guard let isSelectable = tisInputSource.getProperty(for: kTISPropertyInputSourceIsSelectCapable) as? Bool else {
             return nil
         }
         
-        guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceIsEnableCapable),
-              let isEnableable = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? Bool else {
+        guard let isEnableable = tisInputSource.getProperty(for: kTISPropertyInputSourceIsEnableCapable) as? Bool else {
             return nil
         }
         
-        guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceIsSelected),
-              let isSelected = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? Bool else {
+        guard let isSelected = tisInputSource.getProperty(for: kTISPropertyInputSourceIsSelected) as? Bool else {
             return nil
         }
         
-        guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceIsEnabled),
-              let isEnabled = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? Bool else {
+        guard let isEnabled = tisInputSource.getProperty(for: kTISPropertyInputSourceIsEnabled) as? Bool else {
             return nil
         }
         
-        guard let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyInputSourceLanguages),
-              let sourceLanguages = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? [String] else {
+        guard let sourceLanguages = tisInputSource.getProperty(for: kTISPropertyInputSourceLanguages) as? [String] else {
             return nil
-        }
-        
-        var url: URL?
-         if let pointer = TISGetInputSourceProperty(tisInputSource, kTISPropertyIconImageURL),
-         let iconImageURL = Unmanaged<AnyObject>.fromOpaque(pointer).takeUnretainedValue() as? URL? {
-         url = iconImageURL
-         }
-         
-        var iconRef: IconRef?
-        if let retIconRef = OpaquePointer(TISGetInputSourceProperty(tisInputSource, kTISPropertyIconRef)) as IconRef? {
-                  iconRef = retIconRef
         }
         
         self.id = id
@@ -121,8 +103,8 @@ extension InputSource: TISInputSourceConvertible {
         self.isSelected = isSelected
         self.isEnabled = isEnabled
         self.sourceLanguages = sourceLanguages
-        self.iconImageURL = url
-        self.iconRef = iconRef
+        self.iconImageURL = tisInputSource.getProperty(for: kTISPropertyIconImageURL) as? URL
+        self.iconRef = OpaquePointer(TISGetInputSourceProperty(tisInputSource, kTISPropertyIconRef)) as IconRef?
     }
     
     
