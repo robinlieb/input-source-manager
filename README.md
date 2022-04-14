@@ -1,4 +1,4 @@
-# input-source-manager
+# InputSourceManager
 Library wrapper for Text Input Source Services API
 
 # Getting Started
