@@ -10,6 +10,8 @@ public class InputSourceEventManager: ObservableObject {
     let iohidManager: IOHIDManager
     let notificationCenter: CFNotificationCenter
     
+    var context: UnsafeMutableRawPointer?
+    
     @Published
     public private(set) var event: InputSourceEvent?
     
@@ -30,11 +32,14 @@ public class InputSourceEventManager: ObservableObject {
     
     deinit {
         print("deinit \(self)")
+        CFNotificationCenterRemoveEveryObserver(notificationCenter, context)
+        IOHIDManagerClose(iohidManager, IOOptionBits(kIOHIDOptionsTypeNone))
+        IOHIDManagerUnscheduleFromRunLoop(iohidManager, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
     }
     
     // MARK: - Helpers
     private func setup() {
-        let context = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+        context = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
         CFNotificationCenterAddObserver(notificationCenter, context, layoutCallback, kTISNotifySelectedKeyboardInputSourceChanged, nil, .deliverImmediately)
         
         let criteria = [
